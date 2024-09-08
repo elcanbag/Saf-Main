@@ -10,7 +10,7 @@ const int serverPort = 8094;
 const char* serverPath = "/";
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
 
     String serverUrl = "ws://" + String(serverIp) + ":" + String(serverPort) + String(serverPath);
     setupWebSocket(ssid, password, serverUrl.c_str());
