@@ -16,6 +16,7 @@ void setup() {
     setupWebSocket(ssid, password, serverUrl.c_str());
 }
 
+
 void loop() {
     sendData();
     managePingPong();
