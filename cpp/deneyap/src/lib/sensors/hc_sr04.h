@@ -1,33 +1,25 @@
 #ifndef HC_SR04_H
 #define HC_SR04_H
 
-#include <Arduino.h>
+#define TRIG_PIN 18
+#define ECHO_PIN 19
 
-#define TRIG_PIN D0
-#define ECHO_PIN D1
+#include <Arduino.h>
 
 void setupHCSR04() {
     pinMode(TRIG_PIN, OUTPUT);
     pinMode(ECHO_PIN, INPUT);
 }
 
-long getDistance() {
-
+float getDistance() {
     digitalWrite(TRIG_PIN, LOW);
     delayMicroseconds(2);
-    
-    
     digitalWrite(TRIG_PIN, HIGH);
     delayMicroseconds(10);
     digitalWrite(TRIG_PIN, LOW);
-    
 
     long duration = pulseIn(ECHO_PIN, HIGH);
-    
-
-    long distance = duration * 0.034 / 2;
-    
-    return distance;
+    return duration * 0.034 / 2;  // Convert to cm
 }
 
-#endif
+#endif // HC_SR04_H

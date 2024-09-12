@@ -2,68 +2,78 @@
 #define WEBSOCKET_H
 
 #include <ArduinoWebsockets.h>
-#include "lib/sensors/temperature.h"
-#include "lib/sensors/gyro.h"
 #include "lib/sensors/bmp.h"
+#include "lib/sensors/gyro.h"
 #include "lib/sensors/hc_sr04.h"
+#include "lib/sensors/temperature.h"
 
 using namespace websockets;
 
-WebsocketsClient client;
+// WebSocket client
+WebsocketsClient webSocket;
 
-void setupWebSocket(const char* ssid, const char* password, const char* serverUrl) {
+void sendWebSocketMessage(String key, String value) {
+    if (webSocket.available()) {
+        String message = key + ":" + value;
+        webSocket.send(message);
+    }
+}
+
+void connectToWiFi(const char* ssid, const char* password) {
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("Wi-Fi already connected");
+        return;
+    }
+    
     WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
+    uint8_t attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 10) {
+        delay(500);  // Shorter retry interval
+        Serial.println("Connecting to WiFi...");
+        attempts++;
     }
-    Serial.println("WiFi Connected!");
 
-    client.connect(serverUrl);
-    Serial.println("WebSocket Connection Established!");
-
-    BeginDHT();
-    BeginGyro();
-    beginBMP();
-    setupHCSR04();
-}
-
-void sendData() {
-    if (client.available()) {
-        float temp = getTemp();
-        float internalTemp = getGyroTemp();
-        float pressure = getBMPPress() / 100.0;
-        float hum = getHum();
-        long distance = getDistance();
-
-        float* gyroData = getGyro();
-        float x = gyroData[0];
-        float y = gyroData[1];
-        float z = gyroData[2];
-
-        client.send("date:10/02/2024");
-        client.send("hum:" + String(hum));
-        client.send("lat:42.6448998");
-        client.send("longg:42.6448998");
-        client.send("temp:" + String(temp));
-        client.send("x:" + String(x));
-        client.send("y:" + String(y));
-        client.send("z:" + String(z));
-        client.send("internalTemp:" + String(internalTemp));
-        client.send("pressure:" + String(pressure));
-        client.send("distance:" + String(distance) + " cm");
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("Connected to WiFi");
+    } else {
+        Serial.println("Failed to connect to WiFi");
     }
 }
 
-void managePingPong() {
-    static unsigned long lastPingTime = 0;
-    if (millis() - lastPingTime > 10000) {
-        client.ping();
-        Serial.println("Ping sent");
-        lastPingTime = millis();
+void connectWebSocket(const char* server_ip, uint16_t server_port) {
+    String ws_server_url = String("ws://") + server_ip + ":" + String(server_port) + "/";
+    if (webSocket.connect(ws_server_url)) {
+        Serial.println("WebSocket connected!");
+    } else {
+        Serial.println("WebSocket connection failed!");
     }
-
-    client.poll();
 }
 
-#endif
+void gatherAndSendSensorData() {
+    // Get sensor data
+    float humidity = readHumidity();
+    float temperature = readTemperature();
+    float pressure = readPressure();
+    float distance = getDistance();
+    float internalTemp = readGyroTemperature();
+    sensors_event_t a = readGyroAcceleration();
+
+    // Send sensor data as individual messages via WebSocket
+    sendWebSocketMessage("date", "10/02/2024");
+    sendWebSocketMessage("hum", String(humidity, 2));
+    sendWebSocketMessage("lat", "42.6448998");
+    sendWebSocketMessage("longg", "42.6448998");
+    sendWebSocketMessage("temp", String(temperature, 2));
+    sendWebSocketMessage("x", String(a.acceleration.x, 2));
+    sendWebSocketMessage("y", String(a.acceleration.y, 2));
+    sendWebSocketMessage("z", String(a.acceleration.z, 2));
+    sendWebSocketMessage("internalTemp", String(internalTemp, 2));
+    sendWebSocketMessage("pressure", String(pressure, 2));
+    sendWebSocketMessage("distance", String(distance, 2));
+}
+
+void webSocketLoop() {
+    webSocket.poll();
+}
+
+#endif // WEBSOCKET_H

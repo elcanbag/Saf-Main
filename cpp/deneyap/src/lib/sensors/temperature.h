@@ -1,30 +1,23 @@
-#include <Adafruit_Sensor.h>
+#ifndef TEMPERATURE_H
+#define TEMPERATURE_H
+
 #include <DHT.h>
-#include <DHT_U.h>
 
+#define DHTPIN 13
+#define DHTTYPE DHT11
 
+DHT dht(DHTPIN, DHTTYPE);
 
-//Sensor pin
-#define DHTPIN 13 
-//Sensor type
-#define DHTTYPE    DHT11   
-DHT_Unified dht(DHTPIN, DHTTYPE);
-
-//For DHT Sensor to start working
-void BeginDHT(){
+void setupDHT() {
     dht.begin();
 }
 
-//For Temperature
-int getTemp(){
-    sensors_event_t event;
-    dht.temperature().getEvent(&event);
-    return event.temperature;
+float readHumidity() {
+    return dht.readHumidity();
 }
 
-//For Humidity
-int getHum(){
-    sensors_event_t event;
-    dht.humidity().getEvent(&event);
-    return event.relative_humidity;
+float readTemperature() {
+    return dht.readTemperature();
 }
+
+#endif // TEMPERATURE_H

@@ -1,26 +1,20 @@
 #ifndef BMP_H
 #define BMP_H
 
-#include <SPI.h>
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
 #include <Adafruit_BMP085.h>
 
+// BMP180 sensor setup
 Adafruit_BMP085 bmp;
 
-bool beginBMP()
-{
-    return bmp.begin();
+void setupBMP() {
+    if (!bmp.begin()) {
+        Serial.println("Could not find BMP180 sensor!");
+        while (1);
+    }
 }
 
-float getBMPTemp()
-{
-    return bmp.readTemperature();
-}
-
-float getBMPPress()
-{
+float readPressure() {
     return bmp.readPressure();
 }
 
-#endif
+#endif // BMP_H
