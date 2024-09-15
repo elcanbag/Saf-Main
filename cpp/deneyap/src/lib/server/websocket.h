@@ -59,7 +59,7 @@ void gatherAndSendSensorData() {
     sensors_event_t a = readGyroAcceleration();
 
     // Send sensor data as individual messages via WebSocket
-    sendWebSocketMessage("date", "10/02/2024");
+    sendWebSocketMessage("date", "14/09/2024");
     sendWebSocketMessage("hum", String(humidity, 2));
     sendWebSocketMessage("lat", "42.6448998");
     sendWebSocketMessage("longg", "42.6448998");

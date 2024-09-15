@@ -4,9 +4,11 @@
 // Wi-Fi credentials
 const char* ssid = "Qwerty_asggsvsvsgz";
 const char* password = "ThisLANisMyLAN";
+//const char* ssid = "ED TECH AZ";
+//const char* password = "0706644917";
 
 // WebSocket server IP and port
-const char* server_ip = "192.168.0.198";
+const char* server_ip = "192.168.16.109";
 const uint16_t server_port = 8094;
 
 void setup() {
@@ -32,5 +34,5 @@ void loop() {
     // Gather and send sensor data via WebSocket
     gatherAndSendSensorData();
 
-    delay(1000);  // Adjust delay as needed
+    delay(1000);  
 }
