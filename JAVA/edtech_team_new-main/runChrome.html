@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WebSocket Example</title>
+</head>
+
+<body>
+    <h1>WebSocket Connection</h1>
+    
+    <script>
+        const url = 'ws://127.0.0.1:8094';
+        const connection = new WebSocket(url);
+
+        connection.onopen = () => {
+
+            connection.send("date:10/02/24");
+            connection.send("hum:10");
+            connection.send("lat:42.6448998");
+            connection.send("longg:42.6448998");
+            connection.send("temp:24");
+            connection.send("x:5");
+            connection.send("y:10");
+            connection.send("z:15");
+
+        };
+
+        connection.onmessage = (event) => {
+           
+            console.log(event.data);
+            console.log(event.data.length);
+
+        };
+
+        connection.onerror = (error) => {
+
+        };
+
+        connection.onclose = () => {
+
+        };
+
+
+    </script>
+</body>
+
+</html>
